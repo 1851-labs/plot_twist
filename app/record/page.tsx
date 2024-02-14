@@ -11,7 +11,7 @@ import Header from '@/components/ui/Header';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 
 const RecordVoicePage = () => {
-  const [title, setTitle] = useState('Record your voice note');
+  const [title, setTitle] = useState('Record a story');
   const envVarsUrl = useQuery(api.utils.envVarsMissing);
 
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -86,7 +86,7 @@ const RecordVoicePage = () => {
   }, [isRunning]);
 
   const handleRecordClick = () => {
-    if (title === 'Record your voice note') {
+    if (title === 'Record a story') {
       setTitle('Recording...');
       startRecording();
     } else if (title === 'Recording...') {
@@ -106,7 +106,7 @@ const RecordVoicePage = () => {
         <div className="relative mx-auto flex h-[316px] w-[316px] items-center justify-center">
           <div
             className={`recording-box absolute h-full w-full rounded-[50%] p-[12%] pt-[17%] ${
-              title !== 'Record your voice note' && title !== 'Processing...'
+              title !== 'Record story' && title !== 'Processing...'
                 ? 'record-animation'
                 : ''
             }`}

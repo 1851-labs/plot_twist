@@ -1,16 +1,14 @@
 <a href="https://usenotesgpt.com/">
-  <img alt="NotesGPT – AI-powered voice note taking in seconds." src="/public/images/og-image.png">
-  <h1 align="center">notesGPT</h1>
+  <img alt="PlotTwist - A fun, lighthearted way to share stories and laugh at themselves" src="/public/images/cyclone.svg">
+  <h1 align="center">PlotTwist</h1>
 </a>
 
 <p align="center">
-  Generate action items from your notes in seconds. Powered by Convex, Together.ai, and Whisper.
 </p>
 
 <p align="center">
   <a href="#tech-stack"><strong>Tech Stack</strong></a> ·
   <a href="#deploy-your-own"><strong>Deploy Your Own</strong></a> ·
-  <a href="#future-tasks"><strong>Future Tasks</strong></a>
 </p>
 <br/>
 
@@ -43,15 +41,3 @@ You can deploy this template by setting up the following services and adding the
 5. Make a [Together](https://dub.sh/together-ai) account to get your [API key](https://api.together.xyz/settings/api-keys).
 6. Make a [Replicate](https://replicate.com) account to get your [API key](https://replicate.com/account/api-tokens).
 7. Save your environment variables in Convex [as `REPLICATE_API_KEY` and `TOGETHER_API_KEY`](https://dashboard.convex.dev/deployment/settings/environment-variables?var=REPLICATE_API_KEY&var=TOGETHER_API_KEY).
-
-## Future tasks
-
-- [ ] Whisper transcripts can get queued on Replicate. If that happens, show a message to the user
-- [ ] Make text/images in the landing page smaller to account for multiple screen sizes.
-- [ ] Make the search experience a little smoother overall
-- [ ] Prompt engineer the summary a little more to be more useful than what's currently displaying
-- [ ] Add a Notion integration to be able to get the transcript + summary + action items on there
-- [ ] UI updates to make it look a little nicer based on Youssef's redesign
-- [ ] Be able to edit action items after the fact and set a due date for them
-- [ ] Account for layout shift on the dashboard page when refreshing – show a loading state on content?
-- [ ] Make action items animate out + make checkbox rounded + add a little check icon on hover

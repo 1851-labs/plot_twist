@@ -6,6 +6,13 @@ export default function Footer() {
       <div>
         Powered by{' '}
         <a
+          href="https://www.1854labs.com"
+          target="_blank"
+          className="font-bold transition hover:text-black/50"
+        >
+          1854 Labs,{' '}
+        </a>
+        <a
           href="https://www.convex.dev"
           target="_blank"
           className="font-bold transition hover:text-black/50"

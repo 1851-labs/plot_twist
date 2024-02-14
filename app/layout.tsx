@@ -5,11 +5,11 @@ import Footer from '@/components/ui/Footer';
 import { Toaster } from 'react-hot-toast';
 import { Analytics } from '@vercel/analytics/react';
 
-let title = 'notesGPT - Take notes with your voice';
-let description = 'Generate action items from your notes in seconds';
-let url = 'https://usenotesgpt.com';
-let ogimage = 'https://usenotesgpt.com/images/og-image.png';
-let sitename = 'usenotesgpt.com';
+let title = 'PlotTwist - A fun, lighthearted way to share stories';
+let description = 'A fun, lighthearted way to share stories';
+let url = 'https://usenotesgpt.com'; // TODO: Change
+let ogimage = 'https://usenotesgpt.com/images/og-image.png'; // TODO: Change
+let sitename = 'usenotesgpt.com'; // TODO: Change
 
 export const metadata: Metadata = {
   metadataBase: new URL(url),
