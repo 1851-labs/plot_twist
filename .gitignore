@@ -38,3 +38,7 @@ next-env.d.ts
 
 # vim
 *.swp
+
+# amplify
+.amplify
+amplifyconfiguration*
