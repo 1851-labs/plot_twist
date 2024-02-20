@@ -24,7 +24,7 @@
 - [Clerk](https://clerk.dev/) for user authentication
 - [Tailwind CSS](https://tailwindcss.com/) for styling
 
-## Deploy Your Own
+## Local "deployment"
 
 You can deploy this template by setting up the following services and adding their environment variables:
 
@@ -41,3 +41,16 @@ You can deploy this template by setting up the following services and adding the
 5. Make a [Together](https://dub.sh/together-ai) account to get your [API key](https://api.together.xyz/settings/api-keys).
 6. Make a [Replicate](https://replicate.com) account to get your [API key](https://replicate.com/account/api-tokens).
 7. Save your environment variables in Convex [as `REPLICATE_API_KEY` and `TOGETHER_API_KEY`](https://dashboard.convex.dev/deployment/settings/environment-variables?var=REPLICATE_API_KEY&var=TOGETHER_API_KEY).
+
+# TODO
+[ ] Deploy for external usage under 1851labs domain
+[ ] Revamp UX to store "stories"
+[ ] Add button to turn story into joke
+[ ] Add button to turn story into limrick (poem)
+
+
+# Dev Notes
+- Step #1 - Local setup following `Local "deployment"` above
+- Step #2 - AWS Amplify Deployment
+  - Follow Amplify "Existing App" flow to connect to repo
+  - Set `Build Settings` image to Linux2023
