@@ -1,6 +1,6 @@
 {
-  "name": "notes-gpt",
-  "version": "1.0.0",
+  "name": "plot-twist",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "npm-run-all --parallel dev:backend dev:frontend",
