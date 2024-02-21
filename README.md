@@ -54,3 +54,7 @@ You can deploy this template by setting up the following services and adding the
 - Step #2 - AWS Amplify Deployment
   - Follow Amplify "Existing App" flow to connect to repo
   - Set `Build Settings` image to Linux2023
+  - Setup the environment variables so the build works: https://docs.aws.amazon.com/amplify/latest/userguide/environment-variables.html
+    - Grab from .env.local
+  - Setup the environment variables so deployed app has access to them: https://docs.aws.amazon.com/amplify/latest/userguide/ssr-environment-variables.html
+    - This will pull the env vars set during build and write them to .env.production before running the app
