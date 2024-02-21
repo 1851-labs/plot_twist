@@ -130,7 +130,7 @@ export type SearchResult = {
   score: number;
 };
 
-export const similarstories = actionWithUser({
+export const similarStories = actionWithUser({
   args: {
     searchQuery: v.string(),
   },
