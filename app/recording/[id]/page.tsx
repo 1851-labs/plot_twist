@@ -6,13 +6,13 @@ import RecordingPage from './recording';
 const Page = async ({ params }: { params: { id: string } }) => {
   const id = params.id as any;
   const token = await getAuthToken();
-  const preloadedNote = await preloadQuery(
-    api.notes.getNote,
+  const preloadedStory = await preloadQuery(
+    api.stories.getStory,
     { id },
     { token },
   );
 
-  return <RecordingPage preloadedNote={preloadedNote} />;
+  return <RecordingPage preloadedStory={preloadedStory} />;
 };
 
 export default Page;

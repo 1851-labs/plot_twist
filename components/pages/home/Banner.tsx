@@ -10,7 +10,7 @@ const Banner = () => {
           rel="noreferrer"
           className="mb-5 cursor-pointer rounded-2xl border border-black px-4 py-1 text-sm text-slate-600 transition duration-300 ease-in-out hover:text-slate-700 sm:text-base"
         >
-          Powered by <span className="font-bold">1854 Labs </span>and{' '}<span className="font-bold">Together.ai </span>and{' '}
+          Powered by <span className="font-bold">1851 Labs </span>and{' '}<span className="font-bold">Together.ai </span>and{' '}
           <span className="font-bold">Convex</span>
         </a>
         <h1 className="inline-block text-center text-4xl font-medium tracking-tighter text-dark lg:text-7xl">

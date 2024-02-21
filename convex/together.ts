@@ -24,23 +24,23 @@ const client = Instructor({
   mode: 'TOOLS',
 });
 
-const NoteSchema = z.object({
+const StorySchema = z.object({
   title: z
     .string()
-    .describe('Short descriptive title of what the voice message is about'),
+    .describe('Short descriptive title of what the story is about'),
   summary: z
     .string()
-    .describe('A short summary in the first person of the voice message'),
-  actionItems: z
+    .describe('A short summary of the story'),
+  actionItems: z // TODO: Remove action items as they are irrelevant
     .array(z.string())
     .describe(
-      'A list of action items from the voice note, short and to the point. Make sure all action item lists are fully resolved if they are nested',
+      'A list of action items from the voice story, short and to the point. Make sure all action item lists are fully resolved if they are nested',
     ),
 });
 
 export const chat = internalAction({
   args: {
-    id: v.id('notes'),
+    id: v.id('stories'),
     transcript: v.string(),
   },
   handler: async (ctx, args) => {
@@ -57,7 +57,7 @@ export const chat = internalAction({
           { role: 'user', content: transcript },
         ],
         model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-        response_model: { schema: NoteSchema, name: 'SummarizeNotes' },
+        response_model: { schema: StorySchema, name: 'Summarizestorys' },
         max_retries: 3,
       });
 
@@ -81,18 +81,18 @@ export const chat = internalAction({
 
 export const getTranscript = internalQuery({
   args: {
-    id: v.id('notes'),
+    id: v.id('stories'),
   },
   handler: async (ctx, args) => {
     const { id } = args;
-    const note = await ctx.db.get(id);
-    return note?.transcription;
+    const story = await ctx.db.get(id);
+    return story?.transcription;
   },
 });
 
 export const saveSummary = internalMutation({
   args: {
-    id: v.id('notes'),
+    id: v.id('stories'),
     summary: v.string(),
     title: v.string(),
     actionItems: v.array(v.string()),
@@ -105,17 +105,17 @@ export const saveSummary = internalMutation({
       generatingTitle: false,
     });
 
-    let note = await ctx.db.get(id);
+    let story = await ctx.db.get(id);
 
-    if (!note) {
-      console.error(`Couldn't find note ${id}`);
+    if (!story) {
+      console.error(`Couldn't find story ${id}`);
       return;
     }
     for (let actionItem of actionItems) {
       await ctx.db.insert('actionItems', {
         task: actionItem,
-        noteId: id,
-        userId: note.userId,
+        storyId: id,
+        userId: story.userId,
       });
     }
 
@@ -130,7 +130,7 @@ export type SearchResult = {
   score: number;
 };
 
-export const similarNotes = actionWithUser({
+export const similarstories = actionWithUser({
   args: {
     searchQuery: v.string(),
   },
@@ -141,11 +141,11 @@ export const similarNotes = actionWithUser({
     });
     const embedding = getEmbedding.data[0].embedding;
 
-    // 2. Then search for similar notes
-    const results = await ctx.vectorSearch('notes', 'by_embedding', {
+    // 2. Then search for similar stories
+    const results = await ctx.vectorSearch('stories', 'by_embedding', {
       vector: embedding,
       limit: 16,
-      filter: (q) => q.eq('userId', ctx.userId), // Only search my notes.
+      filter: (q) => q.eq('userId', ctx.userId), // Only search my stories.
     });
 
     console.log({ results });
@@ -159,7 +159,7 @@ export const similarNotes = actionWithUser({
 
 export const embed = internalAction({
   args: {
-    id: v.id('notes'),
+    id: v.id('stories'),
     transcript: v.string(),
   },
   handler: async (ctx, args) => {
@@ -178,7 +178,7 @@ export const embed = internalAction({
 
 export const saveEmbedding = internalMutation({
   args: {
-    id: v.id('notes'),
+    id: v.id('stories'),
     embedding: v.array(v.float64()),
   },
   handler: async (ctx, args) => {

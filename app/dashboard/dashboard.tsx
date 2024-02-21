@@ -10,12 +10,12 @@ import AuthenticatedPreload from '@/components/preloading';
 import { FunctionReturnType } from 'convex/server';
 
 const PreloadedDashboardHomePage = ({
-  preloadedNotes,
+  preloadedStories,
 }: {
-  preloadedNotes: Preloaded<typeof api.notes.getNotes>;
+  preloadedStories: Preloaded<typeof api.stories.getStories>;
 }) => {
   return (
-    <AuthenticatedPreload preload={preloadedNotes}>
+    <AuthenticatedPreload preload={preloadedStories}>
       <DashboardHomePage preloaded={undefined} />
     </AuthenticatedPreload>
   );
@@ -24,41 +24,41 @@ const PreloadedDashboardHomePage = ({
 const DashboardHomePage = ({
   preloaded,
 }: {
-  preloaded: FunctionReturnType<typeof api.notes.getNotes> | undefined;
+  preloaded: FunctionReturnType<typeof api.stories.getStories> | undefined;
 }) => {
-  const allNotes = preloaded!;
+  const allStories = preloaded!;
   const [searchQuery, setSearchQuery] = useState('');
-  const [relevantNotes, setRelevantNotes] =
-    useState<FunctionReturnType<typeof api.notes.getNotes>>();
+  const [relevantStories, setRelevantStories] =
+    useState<FunctionReturnType<typeof api.stories.getStories>>();
 
-  const performMyAction = useAction(api.together.similarNotes);
+  const performMyAction = useAction(api.together.similarStories);
 
   const handleSearch = async (e: any) => {
     e.preventDefault();
 
     console.log({ searchQuery });
     if (searchQuery === '') {
-      setRelevantNotes(undefined);
+      setRelevantStories(undefined);
     } else {
       const scores = await performMyAction({ searchQuery: searchQuery });
       const scoreMap: Map<string, number> = new Map();
       for (const s of scores) {
         scoreMap.set(s.id, s.score);
       }
-      const filteredResults = allNotes.filter(
-        (note) => (scoreMap.get(note._id) ?? 0) > 0.6,
+      const filteredResults = allStories.filter(
+        (story) => (scoreMap.get(story._id) ?? 0) > 0.6,
       );
-      setRelevantNotes(filteredResults);
+      setRelevantStories(filteredResults);
     }
   };
 
-  const finalNotes = relevantNotes ?? allNotes;
+  const finalStories = relevantStories ?? allStories;
 
   return (
     <div suppressHydrationWarning={true} className="mt-5 min-h-[100vh] w-full">
       <div className=" w-full py-[23px] md:py-4 lg:py-[25px]">
         <h1 className="text-center text-2xl font-medium text-dark md:text-4xl">
-          Your Voice Notes
+          Your Story Audio
         </h1>
       </div>
       {/* search bar */}
@@ -82,11 +82,11 @@ const DashboardHomePage = ({
       </div>
       {/* recorded items */}
       <div className="h-fit w-full max-w-[1360px] md:px-5 xl:mx-auto">
-        {finalNotes &&
-          finalNotes.map((item, index) => (
+        {finalStories &&
+          finalStories.map((item, index) => (
             <RecordedfileItemCard {...item} key={index} />
           ))}
-        {finalNotes.length === 0 && (
+        {finalStories.length === 0 && (
           <div className="flex h-[50vh] w-full items-center justify-center">
             <p className="text-center text-2xl text-dark">
               You currently have no <br /> recordings.
@@ -102,15 +102,15 @@ const DashboardHomePage = ({
             style={{ boxShadow: ' 0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}
             href="/record"
           >
-            Record a New Voice Note
+            Record a New Story
           </Link>
-          {allNotes && (
+          {allStories && (
             <Link
               className="rounded-[7px] px-[37px] py-[15px] text-[17px] leading-[79%] tracking-[-0.75px] md:text-2xl"
               style={{ boxShadow: ' 0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}
               href="/dashboard/action-items"
             >
-              View Action Items
+              View Your Stories
             </Link>
           )}
         </div>

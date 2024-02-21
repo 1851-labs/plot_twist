@@ -6,9 +6,9 @@ import { getAuthToken } from '../auth';
 const ServerDashboardHomePage = async () => {
   const token = await getAuthToken();
 
-  const preloadedNotes = await preloadQuery(api.notes.getNotes, {}, { token });
+  const preloadedStories = await preloadQuery(api.stories.getStories, {}, { token });
 
-  return <DashboardHomePage preloadedNotes={preloadedNotes} />;
+  return <DashboardHomePage preloadedStories={preloadedStories} />;
 };
 
 export default ServerDashboardHomePage;

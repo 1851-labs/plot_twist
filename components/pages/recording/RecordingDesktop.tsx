@@ -24,7 +24,7 @@ export default function RecordingDesktop({
 }) {
   const [originalIsOpen, setOriginalIsOpen] = useState<boolean>(true);
 
-  const mutateActionItems = useMutation(api.notes.removeActionItem);
+  const mutateActionItems = useMutation(api.stories.removeActionItem);
 
   function removeActionItem(actionId: any) {
     // Trigger a mutation to remove the item from the list
@@ -40,7 +40,7 @@ export default function RecordingDesktop({
             generatingTitle && 'animate-pulse'
           }`}
         >
-          {generatingTitle ? 'Generating Title...' : title ?? 'Untitled Note'}
+          {generatingTitle ? 'Generating Title...' : title ?? 'Untitled Story'}
         </h1>
         <div className="flex items-center justify-center">
           <p className="text-lg opacity-80">

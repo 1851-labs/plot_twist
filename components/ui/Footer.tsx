@@ -6,11 +6,11 @@ export default function Footer() {
       <div>
         Powered by{' '}
         <a
-          href="https://www.1854labs.com"
+          href="https://www.1851labs.com"
           target="_blank"
           className="font-bold transition hover:text-black/50"
         >
-          1854 Labs,{' '}
+          1851 Labs,{' '}
         </a>
         <a
           href="https://www.convex.dev"
@@ -37,7 +37,7 @@ export default function Footer() {
       </div>
       <div className="flex space-x-4 pb-4 sm:pb-0">
         <Link
-          href="https://twitter.com/nutlope"
+          href="https://twitter.com/1851labs"
           className="group"
           aria-label="Twitter"
         >
@@ -49,7 +49,7 @@ export default function Footer() {
           </svg>
         </Link>
         <Link
-          href="https://github.com/nutlope/notesgpt"
+          href="https://github.com/1851-labs"
           className="group"
           aria-label="GitHub"
         >

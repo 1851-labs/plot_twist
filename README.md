@@ -1,4 +1,4 @@
-<a href="https://usenotesgpt.com/">
+<a href="https://plottwist.1851labs.com/">
   <img alt="PlotTwist - A fun, lighthearted way to share stories and laugh at themselves" src="/public/images/cyclone.svg">
   <h1 align="center">PlotTwist</h1>
 </a>
@@ -18,7 +18,7 @@
 - Next.js [App Router](https://nextjs.org/docs/app) for the framework
 - [Together Inference](https://dub.sh/together-ai) for the LLM (Mixtral)
 - [Together Embeddings](https://dub.sh/together-ai) for the embeddings for search
-- [Convex File Storage](https://docs.convex.dev/file-storage) for storing voice notes
+- [Convex File Storage](https://docs.convex.dev/file-storage) for storing stories audio
 - [Convex Vector search](https://docs.convex.dev/vector-search) for vector search
 - [Replicate](https://replicate.com/) for Whisper transcriptions
 - [Clerk](https://clerk.dev/) for user authentication
@@ -47,9 +47,10 @@ You can deploy this template by setting up the following services and adding the
 [ ] Revamp UX to store "stories"
 [ ] Add button to turn story into joke
 [ ] Add button to turn story into limrick (poem)
+[ ] Change the images and graphics to plottwist screen captures
 
 
-# Dev Notes
+# Amplify Deployment Steps
 - Step #1 - Local setup following `Local "deployment"` above
 - Step #2 - AWS Amplify Deployment
   - Follow Amplify "Existing App" flow to connect to repo

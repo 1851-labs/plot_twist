@@ -6,7 +6,7 @@ import ActionItemsPage from './ais';
 const Page = async () => {
   const token = await getAuthToken();
   const preloadedItems = await preloadQuery(
-    api.notes.getActionItems,
+    api.stories.getActionItems,
     {},
     { token },
   );

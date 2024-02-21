@@ -7,9 +7,9 @@ import { Analytics } from '@vercel/analytics/react';
 
 let title = 'PlotTwist - A fun, lighthearted way to share stories';
 let description = 'A fun, lighthearted way to share stories';
-let url = 'https://usenotesgpt.com'; // TODO: Change
+let url = 'https:/plottwist.1851labs.com';
 let ogimage = 'https://usenotesgpt.com/images/og-image.png'; // TODO: Change
-let sitename = 'usenotesgpt.com'; // TODO: Change
+let sitename = 'plottwist.1851labs.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(url),

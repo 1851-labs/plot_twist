@@ -13,7 +13,7 @@ const RecordedfileItemCard = ({
   _creationTime: number;
   _id: any;
 }) => {
-  const deleteNote = useMutation(api.notes.removeNote);
+  const deleteStory = useMutation(api.stories.removeStory);
 
   return (
     <Link
@@ -50,7 +50,7 @@ const RecordedfileItemCard = ({
         <button
           onClick={(e) => {
             e.preventDefault();
-            deleteNote({ id: _id });
+            deleteStory({ id: _id });
           }}
           className="flex h-fit w-fit cursor-pointer items-center justify-center gap-5 bg-transparent p-2 transition hover:scale-125 md:inline-block"
         >

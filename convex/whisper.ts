@@ -19,7 +19,7 @@ interface whisperOutput {
 export const chat = internalAction({
   args: {
     fileUrl: v.string(),
-    id: v.id('notes'),
+    id: v.id('stories'),
   },
   handler: async (ctx, args) => {
     const replicateOutput = (await replicate.run(
@@ -52,7 +52,7 @@ export const chat = internalAction({
 
 export const saveTranscript = internalMutation({
   args: {
-    id: v.id('notes'),
+    id: v.id('stories'),
     transcript: v.string(),
   },
   handler: async (ctx, args) => {

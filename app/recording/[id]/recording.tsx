@@ -9,12 +9,12 @@ import AuthenticatedPreload from '@/components/preloading';
 import { FunctionReturnType } from 'convex/server';
 
 const PreloadedRecordingPage = ({
-  preloadedNote,
+  preloadedStory,
 }: {
-  preloadedNote: Preloaded<typeof api.notes.getNote>;
+  preloadedStory: Preloaded<typeof api.stories.getStory>;
 }) => {
   return (
-    <AuthenticatedPreload preload={preloadedNote}>
+    <AuthenticatedPreload preload={preloadedStory}>
       <RecordingPage preloaded={undefined} />
     </AuthenticatedPreload>
   );
@@ -23,16 +23,16 @@ const PreloadedRecordingPage = ({
 const RecordingPage = ({
   preloaded,
 }: {
-  preloaded: FunctionReturnType<typeof api.notes.getNote> | undefined;
+  preloaded: FunctionReturnType<typeof api.stories.getStory> | undefined;
 }) => {
-  const currentNote = preloaded!;
+  const currentStory = preloaded!;
 
   return (
     <div className="">
       <Header />
       <div className="mx-auto max-w-[1500px]">
-        <RecordingDesktop {...currentNote} />
-        <RecordingMobile {...currentNote} />
+        <RecordingDesktop {...currentStory} />
+        <RecordingMobile {...currentStory} />
       </div>
     </div>
   );

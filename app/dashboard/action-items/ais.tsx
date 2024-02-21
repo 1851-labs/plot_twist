@@ -10,7 +10,7 @@ import Link from 'next/link';
 const PreloadedActionItemsPage = ({
   preloadedItems,
 }: {
-  preloadedItems: Preloaded<typeof api.notes.getActionItems>;
+  preloadedItems: Preloaded<typeof api.stories.getActionItems>;
 }) => {
   return (
     <AuthenticatedPreload preload={preloadedItems}>
@@ -22,10 +22,10 @@ const PreloadedActionItemsPage = ({
 const ActionItemsPage = ({
   preloaded,
 }: {
-  preloaded: FunctionReturnType<typeof api.notes.getActionItems> | undefined;
+  preloaded: FunctionReturnType<typeof api.stories.getActionItems> | undefined;
 }) => {
   const actionItems = preloaded!;
-  const mutateActionItems = useMutation(api.notes.removeActionItem);
+  const mutateActionItems = useMutation(api.stories.removeActionItem);
 
   function removeActionItem(actionId: any) {
     // Trigger a mutation to remove the item from the list
@@ -82,14 +82,14 @@ const ActionItemsPage = ({
           <div className="flex flex-col items-center justify-center">
             <div className="flex h-[50vh] w-full flex-col items-center justify-center gap-7">
               <p className="text-center text-2xl text-dark">
-                You currently have no action items.
+                You currently have no stories.
               </p>
               <Link
                 className="rounded-[7px] bg-dark px-[37px] py-[15px] text-[17px] leading-[79%] tracking-[-0.75px] text-light md:text-2xl"
                 style={{ boxShadow: ' 0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}
                 href="/record"
               >
-                Record your first voice note
+                Record your first story
               </Link>
             </div>
           </div>

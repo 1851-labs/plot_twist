@@ -2,7 +2,7 @@ import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
 export default defineSchema({
-  notes: defineTable({
+  stories: defineTable({
     userId: v.string(),
     audioFileId: v.string(),
     audioFileUrl: v.string(),
@@ -21,10 +21,10 @@ export default defineSchema({
       filterFields: ['userId'],
     }),
   actionItems: defineTable({
-    noteId: v.id('notes'),
+    storyId: v.id('stories'),
     userId: v.string(),
     task: v.string(),
   })
-    .index('by_noteId', ['noteId'])
+    .index('by_storyId', ['storyId'])
     .index('by_userId', ['userId']),
 });

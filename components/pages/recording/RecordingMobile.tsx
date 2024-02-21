@@ -21,7 +21,7 @@ export default function RecordingMobile({
   const [summaryOpen, setSummaryOpen] = useState<boolean>(false);
   const [actionItemOpen, setActionItemOpen] = useState<boolean>(false);
 
-  const mutateActionItems = useMutation(api.notes.removeActionItem);
+  const mutateActionItems = useMutation(api.stories.removeActionItem);
 
   function removeActionItem(actionId: any) {
     // Trigger a mutation to remove the item from the list
@@ -32,7 +32,7 @@ export default function RecordingMobile({
     <div className="md:hidden">
       <div className="max-width my-5 flex items-center justify-center">
         <h1 className="leading text-center text-xl font-medium leading-[114.3%] tracking-[-0.75px] text-dark md:text-[35px] lg:text-[43px]">
-          {title ?? 'Untitled Note'}
+          {title ?? 'Untitled Story'}
         </h1>
       </div>
       <div className="grid w-full grid-cols-3 ">

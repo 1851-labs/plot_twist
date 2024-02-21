@@ -21,8 +21,8 @@ const RecordVoicePage = () => {
 
   const { user } = useUser();
 
-  const generateUploadUrl = useMutation(api.notes.generateUploadUrl);
-  const createNote = useMutation(api.notes.createNote);
+  const generateUploadUrl = useMutation(api.stories.generateUploadUrl);
+  const createStory = useMutation(api.stories.createStory);
 
   const router = useRouter();
 
@@ -48,11 +48,11 @@ const RecordVoicePage = () => {
       const { storageId } = await result.json();
 
       if (user) {
-        let noteId = await createNote({
+        let storyId = await createStory({
           storageId,
         });
 
-        router.push(`/recording/${noteId}`);
+        router.push(`/recording/${storyId}`);
       }
     };
     setMediaRecorder(recorder as any);
