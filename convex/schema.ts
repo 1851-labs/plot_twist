@@ -27,4 +27,14 @@ export default defineSchema({
   })
     .index('by_storyId', ['storyId'])
     .index('by_userId', ['userId']),
+ jokes: defineTable({
+    storyId: v.id('stories'),
+    userId: v.string(),
+    joke: v.string(),
+    embedding: v.optional(v.array(v.float64())),
+    generatingJoke: v.boolean(),
+  })
+    .index('by_storyId', ['storyId'])
+    .index('by_userId', ['userId']),
+
 });
