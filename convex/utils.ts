@@ -10,6 +10,7 @@ import { Auth } from 'convex/server';
 
 async function getUserId(ctx: { auth: Auth }): Promise<string> {
   const authInfo = await ctx.auth.getUserIdentity();
+
   if (!authInfo) {
     throw new ConvexError('User must be logged in.');
   }

@@ -5,13 +5,13 @@ import { api } from '@/convex/_generated/api';
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function RecordingMobile({
-  actionItems,
+  //actionItems,
   summary,
   transcription,
   title,
   _creationTime,
 }: {
-  actionItems?: any;
+  //actionItems?: any;
   summary?: string;
   transcription?: string;
   title?: string;
@@ -19,14 +19,14 @@ export default function RecordingMobile({
 }) {
   const [transcriptOpen, setTranscriptOpen] = useState<boolean>(true);
   const [summaryOpen, setSummaryOpen] = useState<boolean>(false);
-  const [actionItemOpen, setActionItemOpen] = useState<boolean>(false);
+  //const [actionItemOpen, setActionItemOpen] = useState<boolean>(false);
 
-  const mutateActionItems = useMutation(api.stories.removeActionItem);
+  //const mutateActionItems = useMutation(api.stories.removeActionItem);
 
-  function removeActionItem(actionId: any) {
+  /*function removeActionItem(actionId: any) {
     // Trigger a mutation to remove the item from the list
     mutateActionItems({ id: actionId });
-  }
+  }*/
 
   return (
     <div className="md:hidden">
@@ -35,11 +35,11 @@ export default function RecordingMobile({
           {title ?? 'Untitled Story'}
         </h1>
       </div>
-      <div className="grid w-full grid-cols-3 ">
+      <div className="grid w-full grid-cols-2 ">
         <button
           onClick={() => (
             setTranscriptOpen(!transcriptOpen),
-            setActionItemOpen(false),
+            //setActionItemOpen(false),
             setSummaryOpen(false)
           )}
           className={`py-[12px] text-[17px] leading-[114.3%] tracking-[-0.425px] ${
@@ -51,7 +51,7 @@ export default function RecordingMobile({
         <button
           onClick={() => (
             setTranscriptOpen(false),
-            setActionItemOpen(false),
+            //setActionItemOpen(false),
             setSummaryOpen(!summaryOpen)
           )}
           className={`py-[12px] text-[17px] leading-[114.3%] tracking-[-0.425px] ${
@@ -60,10 +60,11 @@ export default function RecordingMobile({
         >
           Summary
         </button>
+        {/*
         <button
           onClick={() => (
             setTranscriptOpen(false),
-            setActionItemOpen(!actionItemOpen),
+            //setActionItemOpen(!actionItemOpen),
             setSummaryOpen(false)
           )}
           className={`py-[12px] text-[17px] leading-[114.3%] tracking-[-0.425px] ${
@@ -72,6 +73,7 @@ export default function RecordingMobile({
         >
           Action Items
         </button>
+        */}
       </div>
       <div className="w-full">
         {transcriptOpen && (
@@ -84,6 +86,7 @@ export default function RecordingMobile({
             {summary}
           </div>
         )}
+        {/*
         {actionItemOpen && (
           <div className="relative min-h-[70vh] w-full px-4 py-3">
             {' '}
@@ -132,6 +135,7 @@ export default function RecordingMobile({
             </div>{' '}
           </div>
         )}
+        */}
         <Toaster position="bottom-left" reverseOrder={false} />
       </div>
     </div>

@@ -59,3 +59,6 @@ You can deploy this template by setting up the following services and adding the
     - Grab from .env.local
   - Setup the environment variables so deployed app has access to them: https://docs.aws.amazon.com/amplify/latest/userguide/ssr-environment-variables.html
     - This will pull the env vars set during build and write them to .env.production before running the app
+- Step #3 - Custom sub domain for 1851labs.com
+  - https://docs.aws.amazon.com/amplify/latest/userguide/to-add-a-custom-domain-managed-by-a-third-party-dns-provider.html
+  - https://docs.aws.amazon.com/amplify/latest/userguide/to-add-a-custom-domain-managed-by-godaddy.html

@@ -31,11 +31,6 @@ const StorySchema = z.object({
   summary: z
     .string()
     .describe('A short summary of the story'),
-  actionItems: z // TODO: Remove action items as they are irrelevant
-    .array(z.string())
-    .describe(
-      'A list of action items from the voice story, short and to the point. Make sure all action item lists are fully resolved if they are nested',
-    ),
 });
 
 export const chat = internalAction({
@@ -64,7 +59,6 @@ export const chat = internalAction({
       await ctx.runMutation(internal.together.saveSummary, {
         id: args.id,
         summary: extract.summary,
-        actionItems: extract.actionItems,
         title: extract.title,
       });
     } catch (e) {
@@ -72,7 +66,6 @@ export const chat = internalAction({
       await ctx.runMutation(internal.together.saveSummary, {
         id: args.id,
         summary: 'Summary failed to generate',
-        actionItems: [],
         title: 'Title',
       });
     }
@@ -95,10 +88,9 @@ export const saveSummary = internalMutation({
     id: v.id('stories'),
     summary: v.string(),
     title: v.string(),
-    actionItems: v.array(v.string()),
   },
   handler: async (ctx, args) => {
-    const { id, summary, actionItems, title } = args;
+    const { id, summary, title } = args;
     await ctx.db.patch(id, {
       summary: summary,
       title: title,
@@ -111,17 +103,6 @@ export const saveSummary = internalMutation({
       console.error(`Couldn't find story ${id}`);
       return;
     }
-    for (let actionItem of actionItems) {
-      await ctx.db.insert('actionItems', {
-        task: actionItem,
-        storyId: id,
-        userId: story.userId,
-      });
-    }
-
-    await ctx.db.patch(id, {
-      generatingActionItems: false,
-    });
   },
 });
 

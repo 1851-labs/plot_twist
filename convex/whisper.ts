@@ -63,6 +63,14 @@ export const saveTranscript = internalMutation({
       generatingTranscript: false,
     });
 
+    console.log("A: Save Transcript Finished...");
+
+    console.log("B: Creating joke...");
+    await ctx.scheduler.runAfter(0, internal.replicate_joke.chat, {
+      id: args.id,
+      prompt: transcript,
+    });
+
     await ctx.scheduler.runAfter(0, internal.together.chat, {
       id: args.id,
       transcript,

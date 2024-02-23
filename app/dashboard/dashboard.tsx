@@ -36,7 +36,6 @@ const DashboardHomePage = ({
   const handleSearch = async (e: any) => {
     e.preventDefault();
 
-    console.log({ searchQuery });
     if (searchQuery === '') {
       setRelevantStories(undefined);
     } else {
@@ -58,7 +57,7 @@ const DashboardHomePage = ({
     <div suppressHydrationWarning={true} className="mt-5 min-h-[100vh] w-full">
       <div className=" w-full py-[23px] md:py-4 lg:py-[25px]">
         <h1 className="text-center text-2xl font-medium text-dark md:text-4xl">
-          Your Story Audio
+          Your Stories
         </h1>
       </div>
       {/* search bar */}

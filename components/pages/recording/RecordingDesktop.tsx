@@ -1,34 +1,40 @@
-import { api } from '@/convex/_generated/api';
 import { formatTimestamp } from '@/lib/utils';
-import { useMutation } from 'convex/react';
-import Link from 'next/link';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { v } from 'convex/values';
 
 export default function RecordingDesktop({
-  actionItems,
+  jokes, // from stories.getStory
   summary,
   transcription,
   title,
   _creationTime,
   generatingTitle,
   generatingActionItems,
+  _id
 }: {
-  actionItems?: any;
+  jokes?: any;
   summary?: string;
   transcription?: string;
   title?: string;
   _creationTime?: number;
   generatingTitle?: boolean;
   generatingActionItems?: boolean;
+  _id?: any;
 }) {
   const [originalIsOpen, setOriginalIsOpen] = useState<boolean>(true);
 
-  const mutateActionItems = useMutation(api.stories.removeActionItem);
+  // Trigger a mutation to add a new joke to the story
+  const addMutateJoke = useMutation(api.stories.createJoke);
+  const handleCreateJoke = () => {
+    addMutateJoke({ id:_id });
+  };
 
-  function removeActionItem(actionId: any) {
-    // Trigger a mutation to remove the item from the list
-    mutateActionItems({ id: actionId });
+  // Trigger a mutation to remove a joke from the story
+  const removeMutateJoke = useMutation(api.stories.removeJoke);
+  function removeJoke(jokeId: any) {
+    removeMutateJoke({ id: jokeId.id });
   }
 
   return (
@@ -77,11 +83,13 @@ export default function RecordingDesktop({
             </button>
           </div>
         </div>
+        {
         <div className="text-center">
           <h1 className="text-xl leading-[114.3%] tracking-[-0.75px] text-dark lg:text-2xl xl:text-[30px]">
-            Action Items
+            Jokes
           </h1>
-        </div>
+        </div> 
+        }
       </div>
       <div className="grid h-full w-full grid-cols-2 px-[30px] lg:px-[45px]">
         <div className="relative min-h-[70vh] w-full border-r px-5 py-3 text-justify text-xl font-[300] leading-[114.3%] tracking-[-0.6px] lg:text-2xl">
@@ -100,7 +108,7 @@ export default function RecordingDesktop({
         </div>
         <div className="relative mx-auto mt-[27px] w-full max-w-[900px] px-5 md:mt-[45px]">
           {generatingActionItems
-            ? [0, 1, 3].map((item: any, idx: number) => (
+            ? [0].map((item: any, idx: number) => (
                 <div
                   className="animate-pulse border-[#00000033] py-1 md:border-t-[1px] md:py-2"
                   key={idx}
@@ -108,12 +116,6 @@ export default function RecordingDesktop({
                   <div className="flex w-full justify-center">
                     <div className="group w-full items-center rounded p-2 text-lg font-[300] text-dark transition-colors duration-300 checked:text-gray-300 hover:bg-gray-100 md:text-2xl">
                       <div className="flex items-center">
-                        <input
-                          disabled
-                          type="checkbox"
-                          checked={false}
-                          className="mr-4 h-5 w-5 cursor-pointer rounded-sm border-2 border-gray-300"
-                        />
                         <label className="h-5 w-full rounded-full bg-gray-200" />
                       </div>
                       <div className="flex justify-between md:mt-2">
@@ -125,7 +127,7 @@ export default function RecordingDesktop({
                   </div>
                 </div>
               ))
-            : actionItems?.map((item: any, idx: number) => (
+            : jokes?.map((item: any, idx: number) => (
                 <div
                   className="border-[#00000033] py-1 md:border-t-[1px] md:py-2"
                   key={idx}
@@ -133,20 +135,18 @@ export default function RecordingDesktop({
                   <div className="flex w-full justify-center">
                     <div className="group w-full items-center rounded p-2 text-lg font-[300] text-dark transition-colors duration-300 checked:text-gray-300 hover:bg-gray-100 md:text-2xl">
                       <div className="flex items-center">
-                        <input
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              removeActionItem(item._id);
-                              toast.success('1 task completed.');
-                            }
-                          }}
-                          type="checkbox"
-                          checked={false}
-                          className="mr-4 h-5 w-5 cursor-pointer rounded-sm border-2 border-gray-300"
-                        />
-                        <label className="">{item?.task}</label>
+                       <label className="">{item?.joke}</label>
                       </div>
                       <div className="flex justify-between md:mt-2">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            removeJoke({ id: item._id });
+                          }}
+                            className="flex cursor-pointer items-center justify-center gap-5 bg-transparent p-2 transition hover:scale-125"
+                        >
+                          <img src={'/icons/delete.svg'} alt="delete" width={20} height={20} />
+                        </button>
                         <p className="ml-9 text-[15px] font-[300] leading-[249%] tracking-[-0.6px] text-dark opacity-60 md:inline-block md:text-xl lg:text-xl">
                           {new Date(Number(_creationTime)).toLocaleDateString()}
                         </p>
@@ -154,15 +154,16 @@ export default function RecordingDesktop({
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+          }
           <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center justify-center">
-            <Link
+            <button
+              onClick={handleCreateJoke}
               className="rounded-[7px] bg-dark px-5 py-[15px] text-[17px] leading-[79%] tracking-[-0.75px] text-light md:text-xl lg:px-[37px]"
               style={{ boxShadow: ' 0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}
-              href="/dashboard/action-items"
             >
-              View All Action Items
-            </Link>
+              Generate New Joke
+            </button>
           </div>
         </div>
       </div>
