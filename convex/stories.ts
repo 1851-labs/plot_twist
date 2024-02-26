@@ -354,11 +354,15 @@ export const findSimilarStories = actionWithUser({
     searchQuery: v.string(),
   },
   handler: async (ctx, args): Promise<SearchResult[]> => {
+    console.log("find simialr stories...");
     // 1. First get the embedding of the search query
     const embedding = await ctx.runAction(
       internal.together.bert.getEmbedding, 
       { str: args.searchQuery}
     );
+
+    console.log("embedding: ", embedding);
+
 
     // 2. Then search for similar stories
     const results = await ctx.vectorSearch('stories', 'by_embedding', {
@@ -366,6 +370,8 @@ export const findSimilarStories = actionWithUser({
       limit: 16,
       filter: (q) => q.eq('userId', ctx.userId), // Only search my stories.
     });
+
+    console.log("results: ", results);
 
     return results.map((r) => ({
       id: r._id,

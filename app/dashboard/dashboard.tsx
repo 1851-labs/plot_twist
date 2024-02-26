@@ -31,7 +31,7 @@ const DashboardHomePage = ({
   const [relevantStories, setRelevantStories] =
     useState<FunctionReturnType<typeof api.stories.getStories>>();
 
-  const performMyAction = useAction(api.stories.findSimilarStories);
+  const searchForSimilarStories = useAction(api.stories.findSimilarStories);
 
   const handleSearch = async (e: any) => {
     e.preventDefault();
@@ -39,13 +39,13 @@ const DashboardHomePage = ({
     if (searchQuery === '') {
       setRelevantStories(undefined);
     } else {
-      const scores = await performMyAction({ searchQuery: searchQuery });
+      const scores = await searchForSimilarStories({ searchQuery: searchQuery });
       const scoreMap: Map<string, number> = new Map();
       for (const s of scores) {
         scoreMap.set(s.id, s.score);
       }
       const filteredResults = allStories.filter(
-        (story) => (scoreMap.get(story._id) ?? 0) > 0.6,
+        (story) => (scoreMap.get(story._id) ?? 0) > 0.5,
       );
       setRelevantStories(filteredResults);
     }
