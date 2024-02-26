@@ -31,7 +31,7 @@ const DashboardHomePage = ({
   const [relevantStories, setRelevantStories] =
     useState<FunctionReturnType<typeof api.stories.getStories>>();
 
-  const performMyAction = useAction(api.together.similarStories);
+  const performMyAction = useAction(api.stories.findSimilarStories);
 
   const handleSearch = async (e: any) => {
     e.preventDefault();
@@ -103,15 +103,6 @@ const DashboardHomePage = ({
           >
             Record a New Story
           </Link>
-          {allStories && (
-            <Link
-              className="rounded-[7px] px-[37px] py-[15px] text-[17px] leading-[79%] tracking-[-0.75px] md:text-2xl"
-              style={{ boxShadow: ' 0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}
-              href="/dashboard/action-items"
-            >
-              View Your Stories
-            </Link>
-          )}
         </div>
       </div>
     </div>
