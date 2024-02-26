@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useMutation, useQuery } from 'convex/react';
+import Header from '@/components/ui/Header';
+import Image from 'next/image';
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { api } from '@/convex/_generated/api';
 import { getCurrentFormattedDate } from '@/lib/utils';
-import { useUser } from '@clerk/clerk-react';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { useMutation, useQuery } from 'convex/react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/ui/Header';
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { useUser } from '@clerk/clerk-react';
 
 const RecordVoicePage = () => {
   const [title, setTitle] = useState('Record a story');

@@ -1,6 +1,6 @@
 import { formatTimestamp } from '@/lib/utils';
 import { useState } from 'react';
-import { useMutation } from 'convex/react';
+import { useMutation, useAction } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { v } from 'convex/values';
 
@@ -11,7 +11,7 @@ export default function RecordingDesktop({
   title,
   _creationTime,
   generatingTitle,
-  generatingActionItems,
+  generatingJoke,
   _id
 }: {
   jokes?: any;
@@ -20,19 +20,19 @@ export default function RecordingDesktop({
   title?: string;
   _creationTime?: number;
   generatingTitle?: boolean;
-  generatingActionItems?: boolean;
+  generatingJoke?: boolean;
   _id?: any;
 }) {
   const [originalIsOpen, setOriginalIsOpen] = useState<boolean>(true);
 
   // Trigger a mutation to add a new joke to the story
-  const addMutateJoke = useMutation(api.stories.createJoke);
+  const createNewJokeAction = useAction(api.jokes.createJokeFromStory);
   const handleCreateJoke = () => {
-    addMutateJoke({ id:_id });
+    createNewJokeAction({ id:_id });
   };
 
   // Trigger a mutation to remove a joke from the story
-  const removeMutateJoke = useMutation(api.stories.removeJoke);
+  const removeMutateJoke = useMutation(api.jokes.removeJoke);
   function removeJoke(jokeId: any) {
     removeMutateJoke({ id: jokeId.id });
   }
@@ -107,7 +107,7 @@ export default function RecordingDesktop({
           )}
         </div>
         <div className="relative mx-auto mt-[27px] w-full max-w-[900px] px-5 md:mt-[45px]">
-          {generatingActionItems
+          {generatingJoke || !jokes
             ? [0].map((item: any, idx: number) => (
                 <div
                   className="animate-pulse border-[#00000033] py-1 md:border-t-[1px] md:py-2"

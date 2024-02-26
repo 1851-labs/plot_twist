@@ -14,12 +14,15 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as joke from "../joke.js";
-import type * as replicate_joke from "../replicate_joke.js";
+import type * as jokes from "../jokes.js";
+import type * as replicate_llama from "../replicate/llama.js";
+import type * as replicate_mixtral from "../replicate/mixtral.js";
+import type * as replicate_stable_diffusion from "../replicate/stable_diffusion.js";
+import type * as replicate_whisper from "../replicate/whisper.js";
 import type * as stories from "../stories.js";
-import type * as together from "../together.js";
+import type * as together_bert from "../together/bert.js";
+import type * as together_mixtral from "../together/mixtral.js";
 import type * as utils from "../utils.js";
-import type * as whisper from "../whisper.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -30,12 +33,15 @@ import type * as whisper from "../whisper.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  joke: typeof joke;
-  replicate_joke: typeof replicate_joke;
+  jokes: typeof jokes;
+  "replicate/llama": typeof replicate_llama;
+  "replicate/mixtral": typeof replicate_mixtral;
+  "replicate/stable_diffusion": typeof replicate_stable_diffusion;
+  "replicate/whisper": typeof replicate_whisper;
   stories: typeof stories;
-  together: typeof together;
+  "together/bert": typeof together_bert;
+  "together/mixtral": typeof together_mixtral;
   utils: typeof utils;
-  whisper: typeof whisper;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

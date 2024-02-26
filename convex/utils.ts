@@ -1,10 +1,15 @@
 import { ConvexError } from 'convex/values';
-import { action, mutation, query } from './_generated/server';
+import { 
+  action, 
+  mutation, 
+  query, internalMutation, 
+  internalAction 
+} from './_generated/server';
 import {
   customAction,
   customCtx,
   customMutation,
-  customQuery,
+  customQuery
 } from 'convex-helpers/server/customFunctions';
 import { Auth } from 'convex/server';
 
@@ -35,8 +40,26 @@ export const mutationWithUser = customMutation(
   }),
 );
 
+export const internalMutationWithUser = customMutation(
+  internalMutation,
+  customCtx(async (ctx) => {
+    return {
+      userId: await getUserId(ctx),
+    };
+  }),
+);
+
 export const actionWithUser = customAction(
   action,
+  customCtx(async (ctx) => {
+    return {
+      userId: await getUserId(ctx),
+    };
+  }),
+);
+
+export const internalActionWithUser = customAction(
+  internalAction,
   customCtx(async (ctx) => {
     return {
       userId: await getUserId(ctx),

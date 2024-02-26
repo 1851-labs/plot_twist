@@ -1,7 +1,20 @@
 import { ConvexError, v } from 'convex/values';
-import { internal } from './_generated/api';
-import { mutationWithUser, queryWithUser } from './utils';
+import { internal, api } from './_generated/api';
+import {
+  internalAction,
+  internalMutation,
+  internalQuery,
+} from './_generated/server';
+import { 
+  actionWithUser, 
+  mutationWithUser, 
+  queryWithUser 
+} from './utils';
 
+/*
+ * Upload URL
+ * ----------
+ */
 export const generateUploadUrl = mutationWithUser({
   args: {},
   handler: async (ctx) => {
@@ -9,28 +22,10 @@ export const generateUploadUrl = mutationWithUser({
   },
 });
 
-export const createJoke = mutationWithUser({
-  args:{
-    id: v.id('stories')
-  },
-  handler: async (ctx, args) => {
-    const { id } = args;
-    const story = await ctx.db.get(id);
-    if (story?.userId !== ctx.userId) {
-      throw new ConvexError('Ooops, This is not your story.');
-    }
-
-    if (story?.generatingTranscript) {
-      throw new ConvexError('Ooops, the transcript is still being generated.');
-    }
-
-    await ctx.scheduler.runAfter(0, internal.replicate_joke.chat, {
-      id: id,
-      prompt: story.transcription || "error",
-    });
-  },
-});
-
+/*
+ * Story
+ * -----
+ */
 export const createStory = mutationWithUser({
   args: {
     storageId: v.id('_storage'),
@@ -46,9 +41,11 @@ export const createStory = mutationWithUser({
       generatingTranscript: true,
       generatingTitle: true,
       generatingActionItems: true,
+      generatingEmbellishment: true,
+      generatingJoke: true,
     });
 
-    await ctx.scheduler.runAfter(0, internal.whisper.chat, {
+    await ctx.scheduler.runAfter(0, internal.stories.populateStoryFieldsOnBackend, {
       fileUrl,
       id: storyId,
     });
@@ -56,6 +53,48 @@ export const createStory = mutationWithUser({
     return storyId;
   },
 });
+
+/* 
+ * Populates story fields on the backend by calling various AI apis
+ */
+export const populateStoryFieldsOnBackend = internalAction({
+  args: {
+    fileUrl: v.string(),
+    id: v.id('stories'),
+  },
+  handler: async (ctx, args) => {
+    const fileUrl = args.fileUrl;
+    const storyId = args.id;
+
+    // First generate the transcript of the voice recording...
+    const transcript:string = await ctx.runAction(
+      internal.stories.createAndSaveTranscript, 
+      { fileUrl, id: storyId }
+    );
+
+    // The following are kicked off in parallel and run when ever they are ready...
+
+    // Create & save a joke from the story's transcript
+    await ctx.scheduler.runAfter(
+      0, api.jokes.createJokeFromStory, 
+      { id: storyId }
+    );
+
+    // Create and save the summary and title from the transcript
+    await ctx.scheduler.runAfter(
+      0, internal.stories.createAndSaveSummary, 
+      { id: storyId, transcript }
+    );
+
+    // Create and save an embedding of the transcript
+    await ctx.scheduler.runAfter(
+      0, internal.stories.createAndSaveEmbedding, 
+      { id: storyId, transcript: transcript }
+    );
+
+  }
+});
+
 
 export const getStory = queryWithUser({
   args: {
@@ -69,11 +108,6 @@ export const getStory = queryWithUser({
       throw new ConvexError('Not your story.');
     }
 
-    const actionItems = await ctx.db
-      .query('actionItems')
-      .withIndex('by_storyId', (q) => q.eq('storyId', story._id))
-      .collect();
-    
     const jokes = await ctx.db
       .query('jokes')
       .withIndex('by_storyId', (q) => q.eq('storyId', story._id))
@@ -81,34 +115,9 @@ export const getStory = queryWithUser({
 
     return {
       ...story,
-      actionItems: actionItems,
+      actionItems: [],
       jokes: jokes,
     };
-  },
-});
-
-export const getActionItems = queryWithUser({
-  args: {},
-  handler: async (ctx, args) => {
-    const userId = ctx.userId;
-
-    const actionItems = await ctx.db
-      .query('actionItems')
-      .withIndex('by_userId', (q) => q.eq('userId', userId))
-      .collect();
-
-    let fullActionItems = [];
-
-    for (let item of actionItems) {
-      const story = await ctx.db.get(item.storyId);
-      if (!story) continue;
-      fullActionItems.push({
-        ...item,
-        title: story.title,
-      });
-    }
-
-    return fullActionItems;
   },
 });
 
@@ -140,38 +149,6 @@ export const getStories = queryWithUser({
   },
 });
 
-export const removeJoke = mutationWithUser({
-  args: {
-    id: v.id('jokes'),
-  },
-  handler: async (ctx, args) => {
-    const { id } = args;
-    const existing = await ctx.db.get(id);
-    if (existing) {
-      if (existing.userId !== ctx.userId) {
-        throw new ConvexError('Ooops, this is not your joke to delete.');
-      }
-      await ctx.db.delete(id);
-    }
-  },
-});
-
-export const removeActionItem = mutationWithUser({
-  args: {
-    id: v.id('actionItems'),
-  },
-  handler: async (ctx, args) => {
-    const { id } = args;
-    const existing = await ctx.db.get(id);
-    if (existing) {
-      if (existing.userId !== ctx.userId) {
-        throw new ConvexError('Not your action item');
-      }
-      await ctx.db.delete(id);
-    }
-  },
-});
-
 export const removeStory = mutationWithUser({
   args: {
     id: v.id('stories'),
@@ -184,7 +161,7 @@ export const removeStory = mutationWithUser({
         throw new ConvexError('Not your story');
       }
       await ctx.db.delete(id);
-      // NB: Removing story does *not* remove action items.
+      // NB: Removing story does *not* remove jokes or anything else.
     }
   },
 });
@@ -195,15 +172,233 @@ export const jokeCountForStory = queryWithUser({
   },
   handler: async (ctx, args) => {
     const { storyId } = args;
-    const actionItems = await ctx.db
+    const jokes = await ctx.db
       .query('jokes')
       .withIndex('by_storyId', (q) => q.eq('storyId', storyId))
       .collect();
-    for (const ai of actionItems) {
+    for (const ai of jokes) {
       if (ai.userId !== ctx.userId) {
         throw new ConvexError('Ooops, this is not your story to count jokes for.');
       }
     }
-    return actionItems.length;
+    return jokes.length;
+  },
+});
+
+/*
+ * Story.transcription
+ * -----
+ */
+export const createAndSaveTranscript = internalAction({
+  args: {
+    fileUrl: v.string(),
+    id: v.id('stories'),
+  },
+  handler: async (ctx, args) => {
+    const replicateOutput = (await ctx.runAction(
+      internal.replicate.whisper.getTranscription,
+      { fileUrl: args.fileUrl, id: args.id }
+    )) as string;
+    await ctx.runMutation(internal.stories.saveTranscript, {
+      id: args.id,
+      transcript: replicateOutput,
+    });
+    return replicateOutput;
+  },
+});
+
+export const saveTranscript = internalMutation({
+  args: {
+    id: v.id('stories'),
+    transcript: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { id, transcript } = args;
+
+    await ctx.db.patch(id, {
+      transcription: transcript,
+      generatingTranscript: false,
+    });
+
+  },
+});
+
+export const getTranscript = internalQuery({
+  args: {
+    id: v.id('stories'),
+  },
+  handler: async (ctx, args) => {
+    const { id } = args;
+    const story = await ctx.db.get(id);
+    return story?.transcription;
+  },
+});
+
+/*
+ * Story.embellishment
+ * -----
+ */
+
+export const saveEmbellishment = internalMutation({
+  args: {
+    id: v.id('stories'),
+    embellishment: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { id, embellishment } = args;
+    await ctx.db.patch(id, {
+      embellishment: embellishment,
+      generatingEmbellishment: false,
+    });
+  },
+});
+
+/*
+ * Story.image
+ * -----
+ */
+export const createAndSaveImage = internalAction({
+  args: {
+    id: v.id('stories'),
+    transcript: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const embellishedStory = await ctx.runAction(
+      internal.replicate.llama.llamaStoryEmbellisher, 
+      { prompt: args.transcript }
+    );
+
+    //ctx.runMutation(internal.stories.saveEmbellishment, {});
+
+    const imageDescription = await ctx.runAction(
+      internal.replicate.llama.llamaIllistrator, 
+      { prompt: embellishedStory }
+    );
+
+    const image = await ctx.runAction(
+      internal.replicate.stable_diffusion.generateImage,
+      { prompt: imageDescription, height: 512, width: 512 },
+    );
+
+//    const postURL = await ctx.runMutation(internal.stories.generateUploadUrl, {});
+//    await fetch
+
+  },
+});
+
+/*
+ * Story.summary
+ * -----
+ */
+export const createAndSaveSummary = internalAction({
+  args: {
+    id: v.id('stories'),
+    transcript: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { transcript } = args;
+
+    try {
+      const extract = await ctx.runAction(internal.together.mixtral.summarizeTranscript,
+        { transcript: transcript, id: args.id });
+      await ctx.runMutation(internal.stories.saveSummary, {
+        id: args.id,
+        summary: extract.summary,
+        title: extract.title,
+      });
+    } catch (e) {
+      console.error('Error summarizing transcript through mixtral on together.ai', e);
+      await ctx.runMutation(internal.stories.saveSummary, {
+        id: args.id,
+        summary: 'Summary failed to generate',
+        title: 'Title',
+      });
+    }
+  },
+});
+
+export const saveSummary = internalMutation({
+  args: {
+    id: v.id('stories'),
+    summary: v.string(),
+    title: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { id, summary, title } = args;
+    await ctx.db.patch(id, {
+      summary: summary,
+      title: title,
+      generatingTitle: false,
+    });
+
+    let story = await ctx.db.get(id);
+
+    if (!story) {
+      console.error(`Couldn't find story ${id}`);
+      return;
+    }
+  },
+});
+
+/*
+ * Story.embedding
+ * -----
+ */
+export type SearchResult = {
+  id: string;
+  score: number;
+};
+
+export const findSimilarStories = actionWithUser({
+  args: {
+    searchQuery: v.string(),
+  },
+  handler: async (ctx, args): Promise<SearchResult[]> => {
+    // 1. First get the embedding of the search query
+    const embedding = await ctx.runAction(
+      internal.together.bert.getEmbedding, 
+      { str: args.searchQuery}
+    );
+
+    // 2. Then search for similar stories
+    const results = await ctx.vectorSearch('stories', 'by_embedding', {
+      vector: embedding,
+      limit: 16,
+      filter: (q) => q.eq('userId', ctx.userId), // Only search my stories.
+    });
+
+    return results.map((r) => ({
+      id: r._id,
+      score: r._score,
+    }));
+  },
+});
+export const createAndSaveEmbedding = internalAction({
+  args: {
+    id: v.id('stories'),
+    transcript: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const embedding = await ctx.runAction(
+      internal.together.bert.getEmbedding, 
+      { str: args.transcript }
+    );
+    await ctx.runMutation(internal.stories.saveEmbedding, {
+      id: args.id,
+      embedding,
+    });
+  },
+});
+
+export const saveEmbedding = internalMutation({
+  args: {
+    id: v.id('stories'),
+    embedding: v.array(v.float64()),
+  },
+  handler: async (ctx, args) => {
+    const { id, embedding } = args;
+    await ctx.db.patch(id, {
+      embedding: embedding,
+    });
   },
 });
