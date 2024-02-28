@@ -22,6 +22,8 @@ export default defineSchema({
     generatingTitle: v.boolean(),
     generatingActionItems: v.boolean(), // deprecated
     generatingJoke:v.optional(v.boolean()),
+    generatingImage:v.optional(v.boolean()),
+
   })
     .index('by_userId', ['userId'])
     .vectorIndex('by_embedding', {

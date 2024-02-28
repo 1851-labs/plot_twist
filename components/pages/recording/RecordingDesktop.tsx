@@ -143,7 +143,6 @@ export default function RecordingDesktop({
                       </div>
                       <div className="flex justify-between md:mt-2">
                         <p className="ml-9 text-[15px] font-[300] leading-[249%] tracking-[-0.6px] text-dark opacity-60 md:inline-block md:text-xl lg:text-xl">
-                          {new Date(Number(_creationTime)).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -171,7 +170,6 @@ export default function RecordingDesktop({
                           <img src={'/icons/delete.svg'} alt="delete" width={20} height={20} />
                         </button>
                         <p className="ml-9 text-[15px] font-[300] leading-[249%] tracking-[-0.6px] text-dark opacity-60 md:inline-block md:text-xl lg:text-xl">
-                          {new Date(Number(_creationTime)).toLocaleDateString()}
                         </p>
                       </div>
                     </div>

@@ -22,10 +22,10 @@ export const createJokeFromStory = action({
      * We moved to together+mixtral because it was easier to get the Joke only
      * and there was no "Sure, here is a joke: " prefix or some similar suffix
      */
-    const llama_joke = await ctx.runAction(
-        internal.replicate.llama.llamaJoker, 
-        {prompt: storyText},
-    ) as string;
+    //const llama_joke = await ctx.runAction(
+    //    internal.replicate.llama.llamaJoker, 
+    //    {prompt: storyText},
+    //) as string;
 
     const joke:string = await ctx.runAction(
         internal.together.mixtral.createJokeFromStory, 

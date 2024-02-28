@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/clerk-react';
 
 const RecordVoicePage = () => {
-  const [title, setTitle] = useState('Record a story');
+  const [title, setTitle] = useState('Tell us a story about yourself');
   const envVarsUrl = useQuery(api.utils.envVarsMissing);
 
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -86,7 +86,7 @@ const RecordVoicePage = () => {
   }, [isRunning]);
 
   const handleRecordClick = () => {
-    if (title === 'Record a story') {
+    if (title === 'Tell us a story about yourself') {
       setTitle('Recording...');
       startRecording();
     } else if (title === 'Recording...') {
@@ -102,8 +102,17 @@ const RecordVoicePage = () => {
         <h1 className="pt-[25px] text-center text-xl font-medium text-dark md:pt-[47px] md:text-4xl">
           {title}
         </h1>
-        <p className="mb-20 mt-4 text-gray-400">{formattedDate}</p>
-        <div className="relative mx-auto flex h-[316px] w-[316px] items-center justify-center">
+        <div className="mb-10 relative mx-auto flex h-[316px] w-[316px] items-center justify-center">
+          <Image
+            src={'/images/boy_with_mic.png'}
+            alt="boy with microphone"
+            width={256}
+            height={256}
+            className="h-[256px] w-[256px] md:h-[10px] md:w-[100px]"
+          />
+        </div>
+
+        <div className="relative mx-auto flex h-[216px] w-[216px] items-center justify-center">
           <div
             className={`recording-box absolute h-full w-full rounded-[50%] p-[12%] pt-[17%] ${
               title !== 'Record story' && title !== 'Processing...'
@@ -123,13 +132,13 @@ const RecordVoicePage = () => {
             </h1>
           </div>
         </div>
-        <div className="mt-10 flex w-fit items-center justify-center gap-[33px] pb-7 md:gap-[77px] ">
+        <div className="mt-5 flex w-fit items-center justify-center gap-[33px] pb-7 md:gap-[77px] ">
           {envVarsUrl ? (
             <MissingEnvVars url={envVarsUrl} />
           ) : (
             <button
               onClick={handleRecordClick}
-              className="mt-10 h-fit w-fit rounded-[50%] border-[2px]"
+              className="mt-2 h-fit w-fit rounded-[50%] border-[2px]"
               style={{ boxShadow: '0px 0px 8px 5px rgba(0,0,0,0.3)' }}
             >
               {!isRunning ? (

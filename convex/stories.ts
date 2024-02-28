@@ -6,6 +6,7 @@ import {
   query,
   internalQuery,
   action,
+  mutation,
 } from './_generated/server';
 import { 
   actionWithUser, 
@@ -191,6 +192,23 @@ export const removeStory = mutationWithUser({
   },
 });
 
+/*
+ * Story.jokes
+ * -----
+ */
+
+export const setGeneratingJoke = mutation({
+  args: {
+    id: v.id('stories'),
+  },
+  handler: async (ctx, args) => {
+    const { id } = args;
+    await ctx.db.patch(id, {
+      generatingJoke: true,
+    });
+  },
+}); 
+
 export const jokeCountForStory = queryWithUser({
   args: {
     storyId: v.id('stories'),
@@ -333,6 +351,8 @@ export const createAndSaveImage = action({
 
     //console.log(extract);
 
+    await ctx.runMutation(api.stories.setGeneratingImage, { id: args.id });
+
     const imageDescription = await ctx.runAction(
       internal.together.mixtral.createImageDescStory, 
       { story: story.transcription || "error" }
@@ -370,6 +390,18 @@ export const createAndSaveImage = action({
   },
 });
 
+export const setGeneratingImage = mutation({
+  args: {
+    id: v.id('stories'),
+  },
+  handler: async (ctx, args) => {
+    const { id } = args;
+    await ctx.db.patch(id, {
+      generatingImage: true,
+    });
+  },
+});
+
 export const saveStoryEmbellishment = internalMutation({
   args: {
     id: v.id('stories'),
@@ -402,6 +434,10 @@ export const saveImage = internalMutation({
 
       imageFileId: args.imageFileId,
       imageFileUrl: args.imageFileUrl,
+    });
+
+    await ctx.db.patch(args.storyId, {
+      generatingImage: false,
     });
   },
 });
