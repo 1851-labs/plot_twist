@@ -1,6 +1,8 @@
 import { Preloaded, useConvexAuth, usePreloadedQuery } from 'convex/react';
 import { FunctionReference, FunctionReturnType } from 'convex/server';
 import { cloneElement, useRef, useCallback } from 'react';
+import { useAuth } from '@clerk/clerk-react';
+
 
 interface AuthenticatedPreloadProps<
   P extends Preloaded<FunctionReference<'query'>>,
@@ -13,9 +15,20 @@ const AuthenticatedPreload = <P extends Preloaded<FunctionReference<'query'>>>({
   children,
   preload,
 }: AuthenticatedPreloadProps<P>) => {
+  console.log("AuthenticatedPreload called...");
   const { isAuthenticated } = useConvexAuth();
+  console.log("isAuthenticated: ", isAuthenticated);
   const output = useRef();
+  console.log("output: ",output);
   const useHook = output.current === undefined || isAuthenticated;
+  console.log("useHook: ", useHook);
+
+  const { getToken, isLoaded, isSignedIn } = useAuth();
+  console.log("getToken: ", getToken);
+  console.log("isLoaded: ", isLoaded);
+  console.log("isSignedIn: ", isSignedIn);
+
+
 
   const HookComponent = useCallback(
     ({

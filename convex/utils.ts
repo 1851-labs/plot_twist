@@ -13,20 +13,18 @@ import {
 } from 'convex-helpers/server/customFunctions';
 import { Auth } from 'convex/server';
 
-async function getUserId(ctx: { auth: Auth }): Promise<string> {
-  const authInfo = await ctx.auth.getUserIdentity();
 
-  if (!authInfo) {
-    throw new ConvexError('User must be logged in.');
-  }
-  return authInfo.tokenIdentifier;
+async function getUserId(ctx: { auth: Auth }) {
+  const authInfo = await ctx.auth.getUserIdentity();
+  return authInfo?.tokenIdentifier;
 }
 
 export const queryWithUser = customQuery(
   query,
   customCtx(async (ctx) => {
+    const userId = await getUserId(ctx);
     return {
-      userId: await getUserId(ctx),
+      userId: userId,
     };
   }),
 );
@@ -34,17 +32,12 @@ export const queryWithUser = customQuery(
 export const mutationWithUser = customMutation(
   mutation,
   customCtx(async (ctx) => {
+    const userId = await getUserId(ctx);
+    if (!userId) {
+      throw new ConvexError('User not authenticated');
+    }
     return {
-      userId: await getUserId(ctx),
-    };
-  }),
-);
-
-export const internalMutationWithUser = customMutation(
-  internalMutation,
-  customCtx(async (ctx) => {
-    return {
-      userId: await getUserId(ctx),
+      userId: userId,
     };
   }),
 );
@@ -52,17 +45,12 @@ export const internalMutationWithUser = customMutation(
 export const actionWithUser = customAction(
   action,
   customCtx(async (ctx) => {
+    const userId = await getUserId(ctx);
+    if (!userId) {
+      throw new ConvexError('User not authenticated');
+    }
     return {
-      userId: await getUserId(ctx),
-    };
-  }),
-);
-
-export const internalActionWithUser = customAction(
-  internalAction,
-  customCtx(async (ctx) => {
-    return {
-      userId: await getUserId(ctx),
+      userId: userId,
     };
   }),
 );

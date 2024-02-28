@@ -145,8 +145,11 @@ export const getStory = query({
 
 export const getStories = queryWithUser({
   args: {},
-  handler: async (ctx, args) => {
+  handler: async (ctx, _) => {
     const userId = ctx.userId;
+    if (userId === undefined) {
+      return null;
+    }
     const stories = await ctx.db
       .query('stories')
       .withIndex('by_userId', (q) => q.eq('userId', userId))

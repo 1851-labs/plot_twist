@@ -1,14 +1,16 @@
 'use client';
 
-import RecordedfileItemCard from '@/components/pages/dashboard/RecordedfileItemCard';
-import { api } from '@/convex/_generated/api';
-import { Preloaded, useAction } from 'convex/react';
+import AuthenticatedPreload from '@/components/preloading';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
-import AuthenticatedPreload from '@/components/preloading';
+import RecordedfileItemCard from '@/components/pages/dashboard/RecordedfileItemCard';
 import { FunctionReturnType } from 'convex/server';
+import { Preloaded, useAction } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { usePreloadedQueryWithAuth } from '@/lib/hooks';
+import { useState } from 'react';
 
+/*
 const PreloadedDashboardHomePage = ({
   preloadedStories,
 }: {
@@ -16,17 +18,18 @@ const PreloadedDashboardHomePage = ({
 }) => {
   return (
     <AuthenticatedPreload preload={preloadedStories}>
-      <DashboardHomePage preloaded={undefined} />
+      <DashboardHomePage preloadedStories={undefined} />
     </AuthenticatedPreload>
   );
 };
+*/
 
 const DashboardHomePage = ({
-  preloaded,
+  preloadedStories,
 }: {
-  preloaded: FunctionReturnType<typeof api.stories.getStories> | undefined;
+  preloadedStories:  Preloaded<typeof api.stories.getStories>;
 }) => {
-  const allStories = preloaded!;
+  const allStories = usePreloadedQueryWithAuth(preloadedStories);
   const [searchQuery, setSearchQuery] = useState('');
   const [relevantStories, setRelevantStories] =
     useState<FunctionReturnType<typeof api.stories.getStories>>();
@@ -109,4 +112,5 @@ const DashboardHomePage = ({
   );
 };
 
-export default PreloadedDashboardHomePage;
+//export default PreloadedDashboardHomePage;
+export default DashboardHomePage;
