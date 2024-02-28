@@ -4,20 +4,11 @@ const Banner = () => {
   return (
     <div className="relative h-[350px] w-full  px-4 md:h-[605px] md:px-6 lg:px-8 xl:px-10 2xl:px-0">
       <div className="flex h-full w-full flex-col items-center justify-center">
-        <a
-          href="https://dub.sh/together-ai"
-          target="_blank"
-          rel="noreferrer"
-          className="mb-5 cursor-pointer rounded-2xl border border-black px-4 py-1 text-sm text-slate-600 transition duration-300 ease-in-out hover:text-slate-700 sm:text-base"
-        >
-          Powered by <span className="font-bold">1851 Labs </span>and{' '}<span className="font-bold">Together.ai </span>and{' '}
-          <span className="font-bold">Convex</span>
-        </a>
         <h1 className="inline-block text-center text-4xl font-medium tracking-tighter text-dark lg:text-7xl">
-          Personalized AI-Powered <br className="hidden lg:inline-block" /> Joke Creation
+          Bring the past to life
         </h1>
         <p className="mt-8 text-center text-xl font-light tracking-tight lg:text-3xl">
-          PlotTwist is a fun and lighthearted way to create personal stories using AI.
+          PlotTwist is a fun and lighthearted way to save and engage with the stories of your life.
         </p>
         <Link
           href={'/dashboard'}
