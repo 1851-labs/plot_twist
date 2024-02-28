@@ -12,6 +12,7 @@ export default function RecordingDesktop({
   _creationTime,
   generatingTitle,
   generatingJoke,
+  images, // from stories.getStory
   _id
 }: {
   jokes?: any;
@@ -21,6 +22,7 @@ export default function RecordingDesktop({
   _creationTime?: number;
   generatingTitle?: boolean;
   generatingJoke?: boolean;
+  images?: any,
   _id?: any;
 }) {
   const [originalIsOpen, setOriginalIsOpen] = useState<boolean>(true);
@@ -30,6 +32,12 @@ export default function RecordingDesktop({
   const handleCreateJoke = () => {
     createNewJokeAction({ id:_id });
   };
+
+  // Trigger a mutation to create a new image for the story
+  const createNewImageAction = useAction(api.stories.createAndSaveImage);
+  const handleCreateNewImage = () => {
+    createNewImageAction({ id: _id });
+  }
 
   // Trigger a mutation to remove a joke from the story
   const removeMutateJoke = useMutation(api.jokes.removeJoke);
@@ -105,6 +113,21 @@ export default function RecordingDesktop({
               <li className="h-6 w-full rounded-full bg-gray-200 dark:bg-gray-700"></li>
             </ul>
           )}
+
+          { 
+            images?.map((image: any, idx: number) => (
+              <img src={image.imageFileUrl} height="256px" width="auto" />
+            )) 
+          }
+
+          <button
+            onClick={handleCreateNewImage}
+            className="rounded-[7px] bg-dark px-5 py-[15px] text-[17px] leading-[79%] tracking-[-0.75px] text-light md:text-xl lg:px-[37px]"
+            style={{ boxShadow: ' 0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}
+          >
+            New Image
+          </button>
+
         </div>
         <div className="relative mx-auto mt-[27px] w-full max-w-[900px] px-5 md:mt-[45px]">
           {generatingJoke || !jokes

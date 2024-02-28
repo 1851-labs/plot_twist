@@ -12,12 +12,13 @@ export default defineSchema({
     transcription: v.optional(v.string()),
     summary: v.optional(v.string()),
     embellishment: v.optional(v.string()),
-    imageDescription: v.optional(v.string()),
     embedding: v.optional(v.array(v.float64())),
+    protagonist: v.optional(v.string()),
+    setting: v.optional(v.string()),
+    conflict: v.optional(v.string()),
 
     generatingTranscript: v.boolean(),
     generatingEmbellishment: v.optional(v.boolean()),
-    generatingImageDescription: v.optional(v.boolean()),
     generatingTitle: v.boolean(),
     generatingActionItems: v.boolean(), // deprecated
     generatingJoke:v.optional(v.boolean()),
@@ -55,11 +56,9 @@ export default defineSchema({
     storyId: v.id('stories'),
 
     imageDescription: v.optional(v.string()),
-    generatingImageDescription: v.boolean(),
 
     imageFileId: v.optional(v.string()),
     imageFileUrl: v.optional(v.string()),
-    generatingImageFile: v.boolean(),
     
   })
     .index('by_userId', ['userId'])

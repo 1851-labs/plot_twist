@@ -3,13 +3,17 @@ import { internal, api } from './_generated/api';
 import {
   internalAction,
   internalMutation,
+  query,
   internalQuery,
+  action,
 } from './_generated/server';
 import { 
   actionWithUser, 
   mutationWithUser, 
   queryWithUser 
 } from './utils';
+import { Id } from "./_generated/dataModel";
+
 
 /*
  * Upload URL
@@ -86,17 +90,29 @@ export const populateStoryFieldsOnBackend = internalAction({
       { id: storyId, transcript }
     );
 
+    // Create and save the details of the story
+    await ctx.scheduler.runAfter(
+      0, internal.stories.createAndSaveStoryDetails, 
+      { id: storyId, transcript }
+    );
+
     // Create and save an embedding of the transcript
     await ctx.scheduler.runAfter(
       0, internal.stories.createAndSaveEmbedding, 
       { id: storyId, transcript: transcript }
     );
 
+    // Create and save an image from the transcript
+    await ctx.scheduler.runAfter(
+      0, api.stories.createAndSaveImage, 
+      { id: storyId }
+    );
+
   }
 });
 
 
-export const getStory = queryWithUser({
+export const getStory = query({
   args: {
     id: v.optional(v.id('stories')),
   },
@@ -104,8 +120,8 @@ export const getStory = queryWithUser({
     const { id } = args;
     if (!id) return null;
     const story = await ctx.db.get(id);
-    if (story?.userId !== ctx.userId) {
-      throw new ConvexError('Not your story.');
+    if (!story) {
+      throw new ConvexError('Story not found.');
     }
 
     const jokes = await ctx.db
@@ -113,10 +129,16 @@ export const getStory = queryWithUser({
       .withIndex('by_storyId', (q) => q.eq('storyId', story._id))
       .collect();
 
+    const images = await ctx.db
+      .query('image')
+      .withIndex('by_storyId', (q) => q.eq('storyId', story._id))
+      .collect();
+
     return {
       ...story,
       actionItems: [],
       jokes: jokes,
+      images: images,
     };
   },
 });
@@ -257,32 +279,127 @@ export const saveEmbellishment = internalMutation({
  * Story.image
  * -----
  */
-export const createAndSaveImage = internalAction({
+export const createAndSaveImage = action({
   args: {
     id: v.id('stories'),
-    transcript: v.string(),
   },
   handler: async (ctx, args) => {
+    const story = await ctx.runQuery(api.stories.getStory, { id: args.id });
+    if (!story) {
+      throw new ConvexError('Ooops, this story does not exist.');
+    }
+
+    // llama2 was too hard to control and had so many extra chat prefix and suffix to its answers
+
+    /*
+    console.log("create and save image...");
     const embellishedStory = await ctx.runAction(
       internal.replicate.llama.llamaStoryEmbellisher, 
-      { prompt: args.transcript }
+      { prompt: story.transcription || "error" }
     );
+    console.log("embellishedStory: ", embellishedStory);
+    ctx.runMutation(internal.stories.saveEmbellishment, 
+      { id:args.id, embellishment:embellishedStory }
+    );
+    */
 
-    //ctx.runMutation(internal.stories.saveEmbellishment, {});
+    /*
+    const imageDescription = await ctx.runAction(
+      internal.replicate.mixtral.mixtralImageDescription,
+      {story: story.transcription || "error"},
+    );
+    */
 
+    /*
     const imageDescription = await ctx.runAction(
       internal.replicate.llama.llamaIllistrator, 
       { prompt: embellishedStory }
     );
+    console.log("imageDescription: ", imageDescription);
+    */
 
-    const image = await ctx.runAction(
+
+
+    /*
+    console.log("Calling extractProtagonistAndSetting...")
+    const extract = await ctx.runAction(
+      internal.together.mixtral.extractProtagonistAndSetting,
+      { id: args.id, transcript: story.transcription || "error" }
+    );
+    */
+
+    //console.log(extract);
+
+    const imageDescription = await ctx.runAction(
+      internal.together.mixtral.createImageDescStory, 
+      { story: story.transcription || "error" }
+    );
+
+    console.log("imageDescription: ", imageDescription);
+
+    const imageUrl = await ctx.runAction(
       internal.replicate.stable_diffusion.generateImage,
       { prompt: imageDescription, height: 512, width: 512 },
     );
+    console.log("image url: ", imageUrl);
 
-//    const postURL = await ctx.runMutation(internal.stories.generateUploadUrl, {});
-//    await fetch
+    // Download the image
+    const response = await fetch(imageUrl);
+    console.log("image downloaded...");
+    const image = await response.blob();
 
+    console.log("storying image in file storage...");
+    // Store the image in Convex
+    const imageStorageId: Id<"_storage"> = await ctx.storage.store(image);
+
+    console.log("imageStorageId: ", imageStorageId);
+
+    console.log("Saving image into database...");
+    await ctx.runMutation(internal.stories.saveImage, {
+      userId: story.userId,
+      storyId: args.id,
+      imageDescription: imageDescription,
+      imageFileId: imageStorageId,
+      imageFileUrl: imageUrl,
+    });
+
+    console.log("image saved...");
+  },
+});
+
+export const saveStoryEmbellishment = internalMutation({
+  args: {
+    id: v.id('stories'),
+    embellishment: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { id, embellishment } = args;
+    await ctx.db.patch(id, {
+      embellishment: embellishment,
+      generatingEmbellishment: false,
+    });
+  },
+});
+
+
+export const saveImage = internalMutation({
+  args: {
+    userId: v.string(),
+    storyId: v.id('stories'),
+    imageDescription  : v.string(),
+    imageFileId: v.id('_storage'),
+    imageFileUrl: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert('image', {
+      userId: args.userId,
+      storyId: args.storyId,
+
+      imageDescription: args.imageDescription,
+
+      imageFileId: args.imageFileId,
+      imageFileUrl: args.imageFileUrl,
+    });
   },
 });
 
@@ -311,7 +428,7 @@ export const createAndSaveSummary = internalAction({
       await ctx.runMutation(internal.stories.saveSummary, {
         id: args.id,
         summary: 'Summary failed to generate',
-        title: 'Title',
+        title: transcript.substring(0, 50),
       });
     }
   },
@@ -329,6 +446,62 @@ export const saveSummary = internalMutation({
       summary: summary,
       title: title,
       generatingTitle: false,
+    });
+
+    let story = await ctx.db.get(id);
+
+    if (!story) {
+      console.error(`Couldn't find story ${id}`);
+      return;
+    }
+  },
+});
+
+/*
+ * Story details (protagonist, setting, conflict)
+ * -----
+ */
+export const createAndSaveStoryDetails = internalAction({
+  args: {
+    id: v.id('stories'),
+    transcript: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { transcript } = args;
+
+    try {
+      const extract = await ctx.runAction(internal.together.mixtral.extractStoryDetails,
+        { transcript: transcript, id: args.id });
+      await ctx.runMutation(internal.stories.saveDetails, {
+        id: args.id,
+        protagonist: extract.protagonist,
+        setting: extract.setting,
+        conflict: extract.conflict,
+      });
+    } catch (e) {
+      console.error('Error summarizing transcript through mixtral on together.ai', e);
+      await ctx.runMutation(internal.stories.saveSummary, {
+        id: args.id,
+        summary: 'Summary failed to generate',
+        title: transcript.substring(0, 50),
+      });
+    }
+  },
+});
+
+export const saveDetails = internalMutation({
+  args: {
+    id: v.id('stories'),
+    protagonist: v.string(),
+    setting: v.string(),
+    conflict: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { id, protagonist, setting, conflict } = args;
+    await ctx.db.patch(id, {
+      protagonist: protagonist,
+      setting: setting,
+      conflict: conflict,
     });
 
     let story = await ctx.db.get(id);
@@ -361,17 +534,12 @@ export const findSimilarStories = actionWithUser({
       { str: args.searchQuery}
     );
 
-    console.log("embedding: ", embedding);
-
-
     // 2. Then search for similar stories
     const results = await ctx.vectorSearch('stories', 'by_embedding', {
       vector: embedding,
       limit: 16,
       filter: (q) => q.eq('userId', ctx.userId), // Only search my stories.
     });
-
-    console.log("results: ", results);
 
     return results.map((r) => ({
       id: r._id,

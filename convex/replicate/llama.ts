@@ -29,8 +29,7 @@ const JOKE_SYS_PROMPT:string =  `
     Please ensure that your jokes are socially unbiased and positive in nature. 
     Your jokes need to be coherent, but do not need to be factually correct. 
     Take liberties with the story and turn it into a fun and amusing joke! 
-    Your response should only include the joke, no other text. 
-    Provide no explationations.
+    Return JSON.
 `;
 
 const STORY_TELLER_SYS_PROMPT:string =  `

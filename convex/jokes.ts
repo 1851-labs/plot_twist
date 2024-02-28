@@ -1,6 +1,6 @@
 import { ConvexError, v } from 'convex/values';
 import { internal,api  } from './_generated/api';
-import { internalAction, action } from './_generated/server';
+import { internalAction, internalMutation, action } from './_generated/server';
 import { 
     actionWithUser,
     mutationWithUser, 
@@ -21,18 +21,26 @@ export const createJokeFromStory = action({
       throw new ConvexError('Ooops, the transcript is still being generated.');
     }
     const storyText = story.transcription || "error";
+    
+    /* 
+     * We moved to together+mixtral because it was easier to get the Joke only
+     * and there was no "Sure, here is a joke: " prefix or some similar suffix
+     */
     const llama_joke = await ctx.runAction(
         internal.replicate.llama.llamaJoker, 
         {prompt: storyText},
     ) as string;
-    await ctx.runMutation(internal.jokes.saveJoke, {
-        id,
-        newJoke: llama_joke,
-    });
+
+    const joke:string = await ctx.runAction(
+        internal.together.mixtral.createJokeFromStory, 
+        {story: storyText},
+    ) as string;
+
+    await ctx.runMutation(internal.jokes.saveJoke, { id, newJoke: joke });
   }
 });
 
-export const saveJoke = internalMutationWithUser({
+export const saveJoke = internalMutation({
   args:{
     id: v.id('stories'),
     newJoke: v.string(),
@@ -43,10 +51,6 @@ export const saveJoke = internalMutationWithUser({
 
     if (!story) {
         throw new ConvexError('Ooops, this story does not exist.');
-    }
-
-    if (story?.userId !== ctx.userId) {
-      throw new ConvexError('Ooops, This is not your story.');
     }
 
     if (story?.generatingTranscript) {
