@@ -1,5 +1,5 @@
 'use client';
-import { LogOut, Paintbrush2 } from 'lucide-react';
+import { BookOpen, LogOut, Paintbrush2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { Button } from './button';
 import {
@@ -50,8 +50,8 @@ export function UserNav({
         <DropdownMenuSeparator />
         <Link href="/dashboard">
           <DropdownMenuItem className="hover:cursor-pointer hover:bg-gray-200">
-            <Paintbrush2 className="mr-2 h-4 w-4 text-black" />
-            <span className="text-black">Dashboard</span>
+            <BookOpen className="mr-2 h-4 w-4 text-black" />
+            <span className="text-black">Your Stories</span>
           </DropdownMenuItem>
         </Link>
         <DropdownMenuItem
